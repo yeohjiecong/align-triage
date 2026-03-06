@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 type Domain = "A" | "B" | "C" | "D" | "E";
 type AmberSubtype = "AMBER-GREEN" | "AMBER-AMBER" | "AMBER-RED";
@@ -30,7 +30,6 @@ type TriageResult = {
 };
 
 const triggerOptions: TriggerOption[] = [
-  // Domain A
   { id: "a1", domain: "A", label: "Advanced or metastatic cancer" },
   {
     id: "a2",
@@ -47,20 +46,17 @@ const triggerOptions: TriggerOption[] = [
   { id: "a4", domain: "A", label: "Multi-organ failure involving >3 organs" },
   { id: "a5", domain: "A", label: "Clinical Frailty Score > 6" },
 
-  // Domain B
   { id: "b1", domain: "B", label: "ICU stay > 7 days" },
   { id: "b2", domain: "B", label: "Mechanical ventilation > 5 days" },
   { id: "b3", domain: "B", label: ">2 ICU admissions in the last 3 months" },
   { id: "b4", domain: "B", label: "No meaningful improvement after 72–96 hours of full support" },
   { id: "b5", domain: "B", label: "Escalating organ support with poor trajectory" },
 
-  // Domain C
   { id: "c1", domain: "C", label: "Difficult-to-control pain" },
   { id: "c2", domain: "C", label: "Severe dyspnoea / air hunger" },
   { id: "c3", domain: "C", label: "Persistent agitation or distress" },
   { id: "c4", domain: "C", label: "Psychological or existential distress in patient or family" },
 
-  // Domain D
   { id: "d1", domain: "D", label: "Goals of care unclear" },
   { id: "d2", domain: "D", label: "Family distress or conflict" },
   { id: "d3", domain: "D", label: "Disagreement between team and family" },
@@ -68,7 +64,6 @@ const triggerOptions: TriggerOption[] = [
   { id: "d5", domain: "D", label: "Cultural or religious complexity" },
   { id: "d6", domain: "D", label: "Staff moral distress / ethical concern" },
 
-  // Domain E
   {
     id: "e1",
     domain: "E",
@@ -167,7 +162,6 @@ function classifyTriage(
   const onlyDomainB = triggeredDomains.length === 1 && hasDomainB;
   const hasAnyRedChecklist = selectedReds.length > 0;
 
-  // RED overrides everything
   if (hasAnyRedChecklist) {
     return {
       category: "RED",
@@ -180,7 +174,6 @@ function classifyTriage(
     };
   }
 
-  // GREEN if no trigger at all
   if (noTriggers) {
     return {
       category: "GREEN",
@@ -193,7 +186,6 @@ function classifyTriage(
     };
   }
 
-  // AMBER-RED if Domain A or E present
   if (hasDomainA || hasDomainE) {
     return {
       category: "AMBER-RED",
@@ -208,7 +200,6 @@ function classifyTriage(
     };
   }
 
-  // AMBER-GREEN if only Domain B triggers
   if (onlyDomainB && !hasDomainC && !hasDomainD) {
     return {
       category: "AMBER-GREEN",
@@ -223,7 +214,6 @@ function classifyTriage(
     };
   }
 
-  // Otherwise AMBER-AMBER
   return {
     category: "AMBER-AMBER",
     summary:
@@ -268,7 +258,7 @@ const styles: Record<string, React.CSSProperties> = {
     minHeight: "100vh",
     background: "#f8fafc",
     padding: "24px",
-    paddingBottom: "120px",
+    paddingBottom: "220px",
   },
   wrap: {
     maxWidth: "900px",
@@ -301,9 +291,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   badge: {
     borderRadius: "999px",
-    padding: "10px 16px",
+    padding: "12px 18px",
     fontWeight: 700,
-    fontSize: "14px",
+    fontSize: "16px",
     display: "inline-block",
   },
   infoItem: {
@@ -335,35 +325,72 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "14px",
     color: "#1e3a8a",
   },
-  stickyBar: {
+  stickyBarDesktop: {
+    position: "fixed",
+    left: "50%",
+    transform: "translateX(-50%)",
+    bottom: "24px",
+    width: "min(860px, calc(100vw - 32px))",
+    background: "#ffffff",
+    border: "1px solid #cbd5e1",
+    borderRadius: "22px",
+    padding: "16px 18px",
+    boxShadow: "0 12px 30px rgba(0,0,0,0.14)",
+    zIndex: 1000,
+  },
+  stickyBarMobile: {
     position: "fixed",
     left: "16px",
     right: "16px",
-    bottom: "16px",
+    bottom: "30vh",
     background: "#ffffff",
     border: "1px solid #cbd5e1",
-    borderRadius: "18px",
-    padding: "12px 14px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+    borderRadius: "22px",
+    padding: "16px 18px",
+    boxShadow: "0 12px 30px rgba(0,0,0,0.18)",
     zIndex: 1000,
   },
+  stickyHeading: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "12px",
+    flexWrap: "wrap",
+  },
+  stickyTitle: {
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#0f172a",
+  },
   stickyText: {
-    marginTop: "6px",
-    fontSize: "14px",
+    marginTop: "10px",
+    fontSize: "16px",
     color: "#334155",
-    lineHeight: 1.4,
+    lineHeight: 1.5,
   },
 };
 
 export default function Page() {
   const [selectedTriggerIds, setSelectedTriggerIds] = useState<string[]>([]);
   const [selectedRedIds, setSelectedRedIds] = useState<string[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
   const grouped = groupByDomain(triggerOptions);
 
   const result = useMemo(
     () => classifyTriage(selectedTriggerIds, selectedRedIds),
     [selectedTriggerIds, selectedRedIds],
   );
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth <= 768);
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   function toggleTrigger(id: string) {
     setSelectedTriggerIds((prev) =>
@@ -497,9 +524,9 @@ export default function Page() {
         <button onClick={resetAll} style={styles.button}>Reset all</button>
       </div>
 
-      <div style={styles.stickyBar}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
-          <strong>Current classification</strong>
+      <div style={isMobile ? styles.stickyBarMobile : styles.stickyBarDesktop}>
+        <div style={styles.stickyHeading}>
+          <strong style={styles.stickyTitle}>Current classification</strong>
           <span style={{ ...styles.badge, ...badgeStyle(result.category) }}>{result.category}</span>
         </div>
         <div style={styles.stickyText}>{result.summary}</div>
