@@ -200,15 +200,78 @@ function classifyTriage(
   };
 }
 
-function groupByDomain(options: TriggerOption[]) {
-  return {
-    A: options.filter((o) => o.domain === "A"),
-    B: options.filter((o) => o.domain === "B"),
-    C: options.filter((o) => o.domain === "C"),
-    D: options.filter((o) => o.domain === "D"),
-    E: options.filter((o) => o.domain === "E"),
-  };
-}
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    background: "#f8fafc",
+    padding: "24px",
+  },
+  wrap: {
+    maxWidth: "900px",
+    margin: "0 auto",
+  },
+  hero: {
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    borderRadius: "24px",
+    padding: "24px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+    marginBottom: "24px",
+  },
+  section: {
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
+    borderRadius: "24px",
+    padding: "20px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+    marginBottom: "24px",
+  },
+  option: {
+    display: "flex",
+    gap: "12px",
+    border: "1px solid #e2e8f0",
+    borderRadius: "16px",
+    padding: "12px",
+    marginTop: "12px",
+    alignItems: "flex-start",
+  },
+  badge: {
+    borderRadius: "999px",
+    padding: "10px 16px",
+    fontWeight: 700,
+    fontSize: "14px",
+    display: "inline-block",
+  },
+  infoItem: {
+    border: "1px solid #e2e8f0",
+    borderRadius: "12px",
+    padding: "8px 10px",
+    marginTop: "8px",
+    background: "#ffffff",
+  },
+  actionItem: {
+    border: "1px solid #e2e8f0",
+    borderRadius: "16px",
+    padding: "12px 14px",
+    marginTop: "10px",
+    background: "#f8fafc",
+  },
+  button: {
+    borderRadius: "16px",
+    border: "1px solid #cbd5e1",
+    background: "#ffffff",
+    padding: "10px 16px",
+    cursor: "pointer",
+  },
+  note: {
+    marginTop: "16px",
+    border: "1px solid #bfdbfe",
+    background: "#eff6ff",
+    borderRadius: "16px",
+    padding: "14px",
+    color: "#1e3a8a",
+  },
+};
 
 function badgeStyle(category: FinalCategory): React.CSSProperties {
   if (category === "GREEN") {
@@ -226,86 +289,15 @@ function badgeStyle(category: FinalCategory): React.CSSProperties {
   return { background: "#ecfccb", color: "#3f6212", border: "1px solid #bef264" };
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#f8fafc",
-    padding: "24px",
-  },
-  wrap: {
-    maxWidth: "1280px",
-    margin: "0 auto",
-  },
-  hero: {
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "24px",
-    padding: "24px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-    marginBottom: "24px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "1.2fr 1fr",
-    gap: "24px",
-  },
-  column: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "24px",
-  },
-  card: {
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "24px",
-    padding: "20px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-  },
-  option: {
-    display: "flex",
-    gap: "12px",
-    border: "1px solid #e2e8f0",
-    borderRadius: "16px",
-    padding: "12px",
-    marginTop: "12px",
-    alignItems: "flex-start",
-  },
-  button: {
-    borderRadius: "16px",
-    border: "1px solid #cbd5e1",
-    background: "#ffffff",
-    padding: "10px 16px",
-    cursor: "pointer",
-  },
-  badge: {
-    borderRadius: "999px",
-    padding: "10px 16px",
-    fontWeight: 700,
-    fontSize: "14px",
-  },
-  infoItem: {
-    border: "1px solid #e2e8f0",
-    borderRadius: "12px",
-    padding: "8px 10px",
-    marginTop: "8px",
-    background: "#ffffff",
-  },
-  actionItem: {
-    border: "1px solid #e2e8f0",
-    borderRadius: "16px",
-    padding: "12px 14px",
-    marginTop: "10px",
-    background: "#f8fafc",
-  },
-  note: {
-    marginTop: "16px",
-    border: "1px solid #bfdbfe",
-    background: "#eff6ff",
-    borderRadius: "16px",
-    padding: "14px",
-    color: "#1e3a8a",
-  },
-};
+function groupByDomain(options: TriggerOption[]) {
+  return {
+    A: options.filter((o) => o.domain === "A"),
+    B: options.filter((o) => o.domain === "B"),
+    C: options.filter((o) => o.domain === "C"),
+    D: options.filter((o) => o.domain === "D"),
+    E: options.filter((o) => o.domain === "E"),
+  };
+}
 
 export default function Page() {
   const [selectedTriggerIds, setSelectedTriggerIds] = useState<string[]>([]);
@@ -339,92 +331,85 @@ export default function Page() {
       <div style={styles.wrap}>
         <div style={styles.hero}>
           <h1 style={{ margin: 0, fontSize: "34px", fontWeight: 800 }}>ALIGN ICU Triage Tool</h1>
-          <p style={{ marginTop: "10px", maxWidth: "900px", lineHeight: 1.6, color: "#475569" }}>
+          <p style={{ marginTop: "10px", lineHeight: 1.6, color: "#475569" }}>
             Prototype bedside screening tool based on your ALIGN workflow. Screen on ICU Day 3
             and weekly thereafter. Validate against local governance before clinical deployment.
           </p>
         </div>
 
-        <div style={styles.grid}>
-          <section style={styles.column}>
-            <DomainCard title="Domain A · Disease / Prognosis" items={grouped.A} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
-            <DomainCard title="Domain B · ICU Course" items={grouped.B} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
-            <DomainCard title="Domain C · Symptom Burden" items={grouped.C} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
-            <DomainCard title="Domain D · Communication / Decision" items={grouped.D} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
-            <DomainCard title="Domain E · Surprise Question" items={grouped.E} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
+        <DomainCard title="Domain A · Disease / Prognosis" items={grouped.A} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
+        <DomainCard title="Domain B · ICU Course" items={grouped.B} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
+        <DomainCard title="Domain C · Symptom Burden" items={grouped.C} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
+        <DomainCard title="Domain D · Communication / Decision" items={grouped.D} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
+        <DomainCard title="Domain E · Surprise Question" items={grouped.E} selectedIds={selectedTriggerIds} onToggle={toggleTrigger} />
 
-            <section style={styles.card}>
-              <h2 style={{ marginTop: 0 }}>RED Checklist</h2>
-              <p style={{ color: "#475569", lineHeight: 1.6 }}>
-                If any RED criterion is present, classify as RED and recommend specialist palliative care referral.
-              </p>
+        <section style={styles.section}>
+          <h2 style={{ marginTop: 0 }}>RED Checklist</h2>
+          <p style={{ color: "#475569", lineHeight: 1.6 }}>
+            If any RED criterion is present, classify as RED and recommend specialist palliative care referral.
+          </p>
 
-              {redChecklistOptions.map((item) => (
-                <label key={item.id} style={styles.option}>
-                  <input
-                    type="checkbox"
-                    checked={selectedRedIds.includes(item.id)}
-                    onChange={() => toggleRed(item.id)}
-                    style={{ marginTop: "4px" }}
-                  />
-                  <div>
-                    <div style={{ fontWeight: 600 }}>{item.label}</div>
-                    {item.hint ? (
-                      <div style={{ marginTop: "6px", fontSize: "14px", color: "#64748b" }}>{item.hint}</div>
-                    ) : null}
-                  </div>
-                </label>
-              ))}
-            </section>
+          {redChecklistOptions.map((item) => (
+            <label key={item.id} style={styles.option}>
+              <input
+                type="checkbox"
+                checked={selectedRedIds.includes(item.id)}
+                onChange={() => toggleRed(item.id)}
+                style={{ marginTop: "4px" }}
+              />
+              <div>
+                <div style={{ fontWeight: 600 }}>{item.label}</div>
+                {item.hint ? (
+                  <div style={{ marginTop: "6px", fontSize: "14px", color: "#64748b" }}>{item.hint}</div>
+                ) : null}
+              </div>
+            </label>
+          ))}
+        </section>
 
-            <div>
-              <button onClick={resetAll} style={styles.button}>Reset all</button>
+        <section style={styles.section}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <h2 style={{ margin: 0 }}>Classification</h2>
+            <span style={{ ...styles.badge, ...badgeStyle(result.category) }}>{result.category}</span>
+          </div>
+
+          <p style={{ marginTop: "16px", color: "#334155", lineHeight: 1.6 }}>{result.summary}</p>
+
+          <div style={{ marginTop: "20px" }}>
+            <InfoBlock title="Triggered domains" emptyText="None" items={result.triggeredDomains} />
+            <div style={{ height: "16px" }} />
+            <InfoBlock title="Selected triggers" emptyText="No trigger selected" items={result.triggerLabels} />
+          </div>
+
+          {result.redReasons.length > 0 ? (
+            <div style={{ marginTop: "20px" }}>
+              <InfoBlock title="RED reasons" emptyText="None" items={result.redReasons} />
             </div>
-          </section>
+          ) : null}
+        </section>
 
-          <aside style={styles.column}>
-            <section style={styles.card}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-                <h2 style={{ margin: 0 }}>Classification</h2>
-                <span style={{ ...styles.badge, ...badgeStyle(result.category) }}>{result.category}</span>
-              </div>
+        <section style={styles.section}>
+          <h2 style={{ marginTop: 0 }}>Recommended actions</h2>
+          {result.actions.map((action) => (
+            <div key={action} style={styles.actionItem}>{action}</div>
+          ))}
 
-              <p style={{ marginTop: "16px", color: "#334155", lineHeight: 1.6 }}>{result.summary}</p>
+          {result.reassessment ? (
+            <div style={styles.note}>
+              <strong>Reassessment:</strong> {result.reassessment}
+            </div>
+          ) : null}
+        </section>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "20px" }}>
-                <InfoBlock title="Triggered domains" emptyText="None" items={result.triggeredDomains} />
-                <InfoBlock title="Selected triggers" emptyText="No trigger selected" items={result.triggerLabels} />
-              </div>
+        <section style={styles.section}>
+          <h2 style={{ marginTop: 0 }}>Workflow reminder</h2>
+          <div style={styles.actionItem}>1. Screen on ICU Day 3 and weekly thereafter</div>
+          <div style={styles.actionItem}>2. Tick triggers across Domains A to E</div>
+          <div style={styles.actionItem}>3. Check RED checklist separately</div>
+          <div style={styles.actionItem}>4. Use result to guide ICU-led supportive care or specialist referral</div>
+        </section>
 
-              {result.redReasons.length > 0 ? (
-                <div style={{ marginTop: "20px" }}>
-                  <InfoBlock title="RED reasons" emptyText="None" items={result.redReasons} />
-                </div>
-              ) : null}
-            </section>
-
-            <section style={styles.card}>
-              <h2 style={{ marginTop: 0 }}>Recommended actions</h2>
-              {result.actions.map((action) => (
-                <div key={action} style={styles.actionItem}>{action}</div>
-              ))}
-
-              {result.reassessment ? (
-                <div style={styles.note}>
-                  <strong>Reassessment:</strong> {result.reassessment}
-                </div>
-              ) : null}
-            </section>
-
-            <section style={styles.card}>
-              <h2 style={{ marginTop: 0 }}>Workflow reminder</h2>
-              <div style={styles.actionItem}>1. Screen on ICU Day 3 and weekly thereafter</div>
-              <div style={styles.actionItem}>2. Tick triggers across Domains A to E</div>
-              <div style={styles.actionItem}>3. Check RED checklist separately</div>
-              <div style={styles.actionItem}>4. Use result to guide ICU-led supportive care or specialist referral</div>
-            </section>
-          </aside>
-        </div>
+        <button onClick={resetAll} style={styles.button}>Reset all</button>
       </div>
     </main>
   );
@@ -442,7 +427,7 @@ function DomainCard({
   onToggle: (id: string) => void;
 }) {
   return (
-    <section style={styles.card}>
+    <section style={styles.section}>
       <h2 style={{ marginTop: 0 }}>{title}</h2>
       {items.map((item) => (
         <label key={item.id} style={styles.option}>
