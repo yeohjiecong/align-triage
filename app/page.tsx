@@ -162,6 +162,16 @@ function classifyTriage(
   const onlyDomainB = triggeredDomains.length === 1 && hasDomainB;
   const hasAnyRedChecklist = selectedReds.length > 0;
 
+  // AMBER-GREEN is only valid if Domain B contains ONLY b1 and/or b2
+  const allowedAmberGreenBIds = ["b1", "b2"];
+  const selectedBTriggerIds = selectedTriggers
+    .filter((t) => t.domain === "B")
+    .map((t) => t.id);
+
+  const onlyAllowedAmberGreenBTriggers =
+    selectedBTriggerIds.length > 0 &&
+    selectedBTriggerIds.every((id) => allowedAmberGreenBIds.includes(id));
+
   if (hasAnyRedChecklist) {
     return {
       category: "RED",
@@ -190,7 +200,7 @@ function classifyTriage(
     return {
       category: "AMBER-RED",
       summary:
-        "Higher-risk AMBER category. A poor-prognosis trigger or surprise-question trigger is present.",
+        "At least one trigger is present in Domain A and/or E.",
       triggeredDomains,
       triggerLabels,
       redReasons,
@@ -200,11 +210,11 @@ function classifyTriage(
     };
   }
 
-  if (onlyDomainB && !hasDomainC && !hasDomainD) {
+  if (onlyDomainB && onlyAllowedAmberGreenBTriggers) {
     return {
       category: "AMBER-GREEN",
       summary:
-        "Trigger present, but limited to ICU-course features without Domain A or E triggers.",
+        "No trigger in Domain A. Only Domain B trigger(s) present, limited to ICU stay >7 days and/or mechanical ventilation >5 days.",
       triggeredDomains,
       triggerLabels,
       redReasons,
@@ -217,7 +227,7 @@ function classifyTriage(
   return {
     category: "AMBER-AMBER",
     summary:
-      "Trigger present with moderate complexity. ICU-led structured communication and supportive care review are recommended.",
+      "No trigger in Domain A. Additional triggers are present in Domain B, C, and/or D beyond the AMBER-GREEN criteria.",
     triggeredDomains,
     triggerLabels,
     redReasons,
@@ -258,7 +268,7 @@ const styles: Record<string, React.CSSProperties> = {
     minHeight: "100vh",
     background: "#f8fafc",
     padding: "24px",
-    paddingBottom: "220px",
+    paddingBottom: "280px",
   },
   wrap: {
     maxWidth: "900px",
@@ -291,9 +301,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   badge: {
     borderRadius: "999px",
-    padding: "12px 18px",
+    padding: "14px 22px",
     fontWeight: 700,
-    fontSize: "16px",
+    fontSize: "18px",
     display: "inline-block",
   },
   infoItem: {
@@ -329,12 +339,12 @@ const styles: Record<string, React.CSSProperties> = {
     position: "fixed",
     left: "50%",
     transform: "translateX(-50%)",
-    bottom: "24px",
+    bottom: "36px",
     width: "min(860px, calc(100vw - 32px))",
     background: "#ffffff",
     border: "1px solid #cbd5e1",
-    borderRadius: "22px",
-    padding: "16px 18px",
+    borderRadius: "24px",
+    padding: "18px 20px",
     boxShadow: "0 12px 30px rgba(0,0,0,0.14)",
     zIndex: 1000,
   },
@@ -342,31 +352,32 @@ const styles: Record<string, React.CSSProperties> = {
     position: "fixed",
     left: "16px",
     right: "16px",
-    bottom: "30vh",
+    bottom: "42vh",
     background: "#ffffff",
-    border: "1px solid #cbd5e1",
-    borderRadius: "22px",
-    padding: "16px 18px",
-    boxShadow: "0 12px 30px rgba(0,0,0,0.18)",
+    border: "2px solid #cbd5e1",
+    borderRadius: "24px",
+    padding: "20px 20px",
+    boxShadow: "0 14px 36px rgba(0,0,0,0.22)",
     zIndex: 1000,
   },
   stickyHeading: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "12px",
+    gap: "14px",
     flexWrap: "wrap",
   },
   stickyTitle: {
-    fontSize: "18px",
-    fontWeight: 700,
+    fontSize: "22px",
+    fontWeight: 800,
     color: "#0f172a",
   },
   stickyText: {
-    marginTop: "10px",
-    fontSize: "16px",
+    marginTop: "12px",
+    fontSize: "20px",
     color: "#334155",
-    lineHeight: 1.5,
+    lineHeight: 1.55,
+    fontWeight: 600,
   },
 };
 
