@@ -511,6 +511,21 @@ export default function Page() {
           ) : null}
         </section>
 
+	<section style={styles.section}>
+ 	 <h2 style={{ marginTop: 0 }}>Recommended actions</h2>
+
+ 	 {result.actions.map((action) => (
+    	<div key={action} style={styles.actionItem}>
+    	  {action}
+  	  </div>
+ 	 ))}
+
+ 	 {result.reassessment ? (
+ 	   <div style={styles.note}>
+   	   <strong>Reassessment:</strong> {result.reassessment}
+   	 </div>
+ 	 ) : null}
+	</section>
 
         <section style={styles.section}>
           <h2 style={{ marginTop: 0 }}>Workflow reminder</h2>
