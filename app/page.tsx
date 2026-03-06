@@ -162,7 +162,6 @@ function classifyTriage(
   const onlyDomainB = triggeredDomains.length === 1 && hasDomainB;
   const hasAnyRedChecklist = selectedReds.length > 0;
 
-  // AMBER-GREEN is only valid if Domain B contains ONLY b1 and/or b2
   const allowedAmberGreenBIds = ["b1", "b2"];
   const selectedBTriggerIds = selectedTriggers
     .filter((t) => t.domain === "B")
@@ -263,6 +262,22 @@ function badgeStyle(category: FinalCategory): React.CSSProperties {
   return { background: "#ecfccb", color: "#3f6212", border: "1px solid #bef264" };
 }
 
+function panelStyle(category: FinalCategory): React.CSSProperties {
+  if (category === "GREEN") {
+    return { background: "#f0fdf4", border: "1px solid #86efac" };
+  }
+  if (category === "RED") {
+    return { background: "#fef2f2", border: "1px solid #fca5a5" };
+  }
+  if (category === "AMBER-RED") {
+    return { background: "#fffbeb", border: "2px solid #f59e0b" };
+  }
+  if (category === "AMBER-AMBER") {
+    return { background: "#fffbeb", border: "1px solid #fbbf24" };
+  }
+  return { background: "#f7fee7", border: "1px solid #bef264" };
+}
+
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
@@ -290,6 +305,19 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
     marginBottom: "24px",
   },
+  sectionHeader: {
+    marginTop: 0,
+    marginBottom: "6px",
+    fontSize: "22px",
+    fontWeight: 800,
+    color: "#0f172a",
+  },
+  sectionSubtext: {
+    margin: 0,
+    color: "#64748b",
+    lineHeight: 1.5,
+    fontSize: "14px",
+  },
   option: {
     display: "flex",
     gap: "12px",
@@ -298,6 +326,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "12px",
     marginTop: "12px",
     alignItems: "flex-start",
+    background: "#ffffff",
   },
   badge: {
     borderRadius: "999px",
@@ -305,6 +334,26 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     fontSize: "18px",
     display: "inline-block",
+  },
+  statusPanel: {
+    borderRadius: "20px",
+    padding: "18px",
+    marginTop: "18px",
+  },
+  statusTitle: {
+    fontSize: "14px",
+    fontWeight: 700,
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
+    color: "#475569",
+    marginBottom: "8px",
+  },
+  statusSummary: {
+    marginTop: "14px",
+    fontSize: "17px",
+    lineHeight: 1.55,
+    color: "#1e293b",
+    fontWeight: 600,
   },
   infoItem: {
     border: "1px solid #e2e8f0",
@@ -319,6 +368,14 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "12px 14px",
     marginTop: "10px",
     background: "#f8fafc",
+  },
+  workflowItem: {
+    borderRadius: "18px",
+    padding: "14px 16px",
+    marginTop: "12px",
+    fontSize: "16px",
+    lineHeight: 1.55,
+    fontWeight: 600,
   },
   button: {
     borderRadius: "16px",
@@ -352,7 +409,7 @@ const styles: Record<string, React.CSSProperties> = {
     position: "fixed",
     left: "16px",
     right: "16px",
-    bottom: "55vh",
+    bottom: "42vh",
     background: "#ffffff",
     border: "2px solid #cbd5e1",
     borderRadius: "24px",
@@ -433,6 +490,7 @@ export default function Page() {
 
         <DomainCard
           title="Domain A · Disease / Prognosis"
+          subtitle="Triggers related to underlying prognosis, frailty, and major disease burden."
           items={grouped.A}
           selectedIds={selectedTriggerIds}
           onToggle={toggleTrigger}
@@ -440,6 +498,7 @@ export default function Page() {
 
         <DomainCard
           title="Domain B · ICU Course"
+          subtitle="Triggers related to length of stay, repeated ICU use, and clinical trajectory."
           items={grouped.B}
           selectedIds={selectedTriggerIds}
           onToggle={toggleTrigger}
@@ -447,6 +506,7 @@ export default function Page() {
 
         <DomainCard
           title="Domain C · Symptom Burden"
+          subtitle="Triggers related to distressing symptoms and difficult symptom control."
           items={grouped.C}
           selectedIds={selectedTriggerIds}
           onToggle={toggleTrigger}
@@ -454,6 +514,7 @@ export default function Page() {
 
         <DomainCard
           title="Domain D · Communication / Decision"
+          subtitle="Triggers related to family distress, unclear goals, or complex decision-making."
           items={grouped.D}
           selectedIds={selectedTriggerIds}
           onToggle={toggleTrigger}
@@ -461,14 +522,15 @@ export default function Page() {
 
         <DomainCard
           title="Domain E · Surprise Question"
+          subtitle="Trigger based on clinician concern about in-hospital mortality."
           items={grouped.E}
           selectedIds={selectedTriggerIds}
           onToggle={toggleTrigger}
         />
 
         <section style={styles.section}>
-          <h2 style={{ marginTop: 0 }}>RED Checklist</h2>
-          <p style={{ color: "#475569", lineHeight: 1.6 }}>
+          <h2 style={styles.sectionHeader}>RED Checklist</h2>
+          <p style={styles.sectionSubtext}>
             If any RED criterion is present, classify as RED and recommend specialist palliative care referral.
           </p>
 
@@ -481,7 +543,7 @@ export default function Page() {
                 style={{ marginTop: "4px" }}
               />
               <div>
-                <div style={{ fontWeight: 600 }}>{item.label}</div>
+                <div style={{ fontWeight: 700, color: "#0f172a" }}>{item.label}</div>
                 {item.hint ? (
                   <div style={{ marginTop: "6px", fontSize: "14px", color: "#64748b" }}>{item.hint}</div>
                 ) : null}
@@ -491,12 +553,21 @@ export default function Page() {
         </section>
 
         <section style={styles.section}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            <h2 style={{ margin: 0 }}>Classification</h2>
-            <span style={{ ...styles.badge, ...badgeStyle(result.category) }}>{result.category}</span>
-          </div>
+          <h2 style={styles.sectionHeader}>Classification</h2>
+          <p style={styles.sectionSubtext}>
+            This section updates automatically based on the currently selected triggers.
+          </p>
 
-          <p style={{ marginTop: "16px", color: "#334155", lineHeight: 1.6 }}>{result.summary}</p>
+          <div style={{ ...styles.statusPanel, ...panelStyle(result.category) }}>
+            <div style={styles.statusTitle}>Current result</div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+              <div style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a" }}>{result.category}</div>
+              <span style={{ ...styles.badge, ...badgeStyle(result.category) }}>{result.category}</span>
+            </div>
+
+            <div style={styles.statusSummary}>{result.summary}</div>
+          </div>
 
           <div style={{ marginTop: "20px" }}>
             <InfoBlock title="Triggered domains" emptyText="None" items={result.triggeredDomains} />
@@ -511,28 +582,36 @@ export default function Page() {
           ) : null}
         </section>
 
-	<section style={styles.section}>
- 	 <h2 style={{ marginTop: 0 }}>Recommended actions</h2>
-
- 	 {result.actions.map((action) => (
-    	<div key={action} style={styles.actionItem}>
-    	  {action}
-  	  </div>
- 	 ))}
-
- 	 {result.reassessment ? (
- 	   <div style={styles.note}>
-   	   <strong>Reassessment:</strong> {result.reassessment}
-   	 </div>
- 	 ) : null}
-	</section>
-
         <section style={styles.section}>
-          <h2 style={{ marginTop: 0 }}>Workflow reminder</h2>
-          <div style={styles.actionItem}>1. Screen on ICU Day 3 and weekly thereafter</div>
-          <div style={styles.actionItem}>2. Tick triggers across Domains A to E</div>
-          <div style={styles.actionItem}>3. Check RED checklist separately</div>
-          <div style={styles.actionItem}>4. Use result to guide ICU-led supportive care or specialist referral</div>
+          <h2 style={styles.sectionHeader}>Recommended actions</h2>
+          <p style={styles.sectionSubtext}>
+            These action prompts are tied to the current classification and should support, not replace, clinical judgement.
+          </p>
+
+          {result.actions.map((action) => (
+            <div key={action} style={styles.actionItem}>{action}</div>
+          ))}
+
+          {result.reassessment ? (
+            <div style={styles.note}>
+              <strong>Reassessment:</strong> {result.reassessment}
+            </div>
+          ) : null}
+        </section>
+
+        <section style={{ ...styles.section, ...panelStyle(result.category) }}>
+          <h2 style={styles.sectionHeader}>Workflow reminder</h2>
+          <p style={styles.sectionSubtext}>
+            Quick reminder for bedside use. This section changes colour to match the current triage category.
+          </p>
+
+          <div style={{ ...styles.workflowItem, background: "#ffffff", border: "1px solid #cbd5e1" }}>
+            1. Screen on ICU Day 3 and weekly thereafter. Re-screen earlier if the patient's condition changes.
+          </div>
+
+          <div style={{ ...styles.workflowItem, background: "#ffffff", border: "1px solid #cbd5e1" }}>
+            2. Consult ICU consultant on ICU-led supportive care plans — especially for AMBER-AMBER and AMBER-RED classifications.
+          </div>
         </section>
 
         <button onClick={resetAll} style={styles.button}>Reset all</button>
@@ -551,18 +630,22 @@ export default function Page() {
 
 function DomainCard({
   title,
+  subtitle,
   items,
   selectedIds,
   onToggle,
 }: {
   title: string;
+  subtitle: string;
   items: TriggerOption[];
   selectedIds: string[];
   onToggle: (id: string) => void;
 }) {
   return (
     <section style={styles.section}>
-      <h2 style={{ marginTop: 0 }}>{title}</h2>
+      <h2 style={styles.sectionHeader}>{title}</h2>
+      <p style={styles.sectionSubtext}>{subtitle}</p>
+
       {items.map((item) => (
         <label key={item.id} style={styles.option}>
           <input
@@ -572,7 +655,7 @@ function DomainCard({
             style={{ marginTop: "4px" }}
           />
           <div>
-            <div style={{ fontWeight: 600 }}>{item.label}</div>
+            <div style={{ fontWeight: 700, color: "#0f172a" }}>{item.label}</div>
             {item.hint ? (
               <div style={{ marginTop: "6px", fontSize: "14px", color: "#64748b" }}>{item.hint}</div>
             ) : null}
