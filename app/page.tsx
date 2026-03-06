@@ -352,7 +352,7 @@ const styles: Record<string, React.CSSProperties> = {
     position: "fixed",
     left: "16px",
     right: "16px",
-    bottom: "42vh",
+    bottom: "55vh",
     background: "#ffffff",
     border: "2px solid #cbd5e1",
     borderRadius: "24px",
